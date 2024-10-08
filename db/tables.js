@@ -8,9 +8,34 @@ const user = sequelizeInstance.define("user",{
     bio:{type:DataTypes.STRING},
     email:{type:DataTypes.STRING},
     phone:{type:DataTypes.STRING},
-    account_type:{type:DataTypes.STRING, defaultValue:"player"},
-    money_rub:{type:DataTypes.INTEGER},
+    birthday:{type:DataTypes.DATE, allowNull:false},
+    account_type:{type:DataTypes.STRING, defaultValue:"player"}, //"dev","employee" 
+    money_rub:{type:DataTypes.INTEGER, allowNull:false},
     status:{type:DataTypes.STRING}
+})
+
+const chat = sequelizeInstance.define("chat",{
+    id_chat:{type:DataTypes.INTEGER},
+    id_initializar:{type:DataTypes.INTEGER, references:{model:user, key:"id_user"}},
+    id_receiver:{type:DataTypes.INTEGER, references:{model:user, key:"id_user"}},
+    begin_date:{type:DataTypes.DATE, allowNull:false}
+})
+
+const message = sequelizeInstance.define("message",{
+    id_message:{type:DataTypes.INTEGER, primaryKey:true},
+    id_chat:{type:DataTypes.INTEGER, references:{model:chat, key:"id_chat"}},
+    text:{type:DataTypes.STRING, allowNull:false},
+    send_date:{type:DataTypes.DATE, allowNull:false},
+    status:{type:DataTypes.STRING, allowNull:false}
+})
+
+const friend = sequelizeInstance.define("friend",{
+    id_request:{type:DataTypes.INTEGER, primaryKey:true},
+    id_sender:{type:DataTypes.INTEGER, references:{model:user, key:"id_user"}},
+    id_receiver:{type:DataTypes.INTEGER, references:{model:user, key:"id_user"}},
+    status:{type:DataTypes.STRING, allowNull:false},
+    send_date:{type:DataTypes.DATE, allowNull:false},
+    receive_date:{type:DataTypes.DATE}
 })
 
 const game = sequelizeInstance.define("game",{
@@ -18,6 +43,7 @@ const game = sequelizeInstance.define("game",{
     name:{type:DataTypes.STRING, allowNull:false},
     bio:{type:DataTypes.STRING},
     genre:{type:DataTypes.STRING,allowNull:false},
+    have_multiplayer:{type:DataTypes.BOOLEAN},
     size_mb:{type:DataTypes.INTEGER,allowNull:false},
     download_url:{type:DataTypes.STRING,allowNull:false},
     global_rating:{type:DataTypes.DECIMAL(10,2)},
@@ -28,27 +54,70 @@ const game = sequelizeInstance.define("game",{
 
 const review = sequelizeInstance.define("review",{
     id_cooment_game:{type:DataTypes.INTEGER, primaryKey:true},
-    id_game:{type:DataTypes.INTEGER},
-    id_user:{type:DataTypes.INTEGER},
+    id_game:{type:DataTypes.INTEGER, references:{model:game, key:"id_game"}},
+    id_user:{type:DataTypes.INTEGER, references:{model:user, key:"id_user"}},
     advantages:{type:DataTypes.STRING},
     disadvantages:{type:DataTypes.STRING},
     comment:{type:DataTypes.STRING},
     bugs:{type:DataTypes.STRING},
     publication_date:{type:DataTypes.DATE, allowNull:false},
     last_update_date:{type:DataTypes.DATE},
-    score:{type:DataTypes.DECIMAL(10,2),allowNull:false},
+    rating:{type:DataTypes.DECIMAL(10,2),allowNull:false},
     likes:{type:DataTypes.INTEGER, defaultValues:"0"},
     dislikes:{type:DataTypes.INTEGER, defaultValues:"0"}
 })
 
-const poster = sequelizeInstance.define("poster"{
+const chosen_games = sequelizeInstance.define("chosen_game",{
+    id_user:{type:DataTypes.INTEGER, primaryKey:true, references:{model:user, key:"id_user"}},
+    id_game:{type:DataTypes.INTEGER, primaryKey:true, references:{model:game, key:"id_game"}},
+    added_date:{type:DataTypes.DATE},
+    hours_played:{type:DataTypes.INTEGER},
+    achievs_quantity:{type:DataTypes.INTEGER},
+    game_price:{type:DataTypes.DECIMAL(10,2)},
+    money_spent:{type:DataTypes.DECIMAL(10,2)}
+})
+
+const poster = sequelizeInstance.define("poster",{
     id_media:{type:DataTypes.UUID, primaryKey:true},
-    id_game:{type:DataTypes.INTEGER},
-    media_type:{type:DataTypes.STRING, allowNull:false, defaultValue="image"},
+    id_game:{type:DataTypes.INTEGER, references:{model:game, key:"id_game"}},
+    media_type:{type:DataTypes.STRING, allowNull:false, defaultValue:"image"},
     media_name:{type:DataTypes.STRING, allownull:false},
     media_url:{type:DataTypes.STRING}
 })
 
+const server = sequelizeInstance.define("server",{
+    ip_address_VM:{type:DataTypes.INET,primaryKey:true},
+    ip_address:{type:DataTypes.INET},
+    mac_address:{type:DataTypes.MACADDR},
+    disk_capacity:{type:DataTypes.INTEGER},
+    ram_memory:{type:DataTypes.INTEGER},
+    throughput_capacity:{type:DataTypes.INTEGER},
+    CPU_core_quantity:{type:DataTypes.INTEGER}
+})
+
+
+const dev_game = sequelizeInstance.define("dev_game", {
+    id_game:{type:DataTypes.INTEGER, primaryKey:true, references:{model:game,key:"id_game"}},
+    id_dev:{type:DataTypes.INTEGER, primaryKey:true, references: {model:user, key:"id_user"}},
+    ip_address_VM:{type:DataTypes.INTEGER, primaryKey:true, references:{model:server, key:"ip_address_VM"}},
+    player_number_max:{type:DataTypes.INTEGER}
+})
+
+user.hasMany(dev_game)
+user.hasMany(friend)
+user.hasMany(chat)
+user.hasMany(review)
+user.hasMany(chosen_games)
+
+game.hasMany(review)
+game.hasMany(chosen_games)
+game.hasMany(poster)
+game.hasMany(dev_game)
+
+chat.hasMany(message)
+
+server.hasOne(dev_game)
+
 module.exports = {
-    user,game,review, poster
+    user,game,review,poster,dev_game,chosen_games,message,friend
 }
