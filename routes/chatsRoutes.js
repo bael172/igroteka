@@ -19,4 +19,4 @@ router.delete("/deleteId/:id",chat.delete_id)
 
 //user
 router.get("/getMyChat/:recent",token,chat.get_my_chat) //последний чат
-router.get("/getAllChats",token,chat.get_all_my_chats) //все чаты
+router.get("/getAllChats",token,chat.get_all_my_chats) //все мои чаты
