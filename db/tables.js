@@ -3,6 +3,7 @@ const {DataTypes, Op} = require("sequelize")
 
 const user = sequelizeInstance.define("user",{
     id_user:{type:DataTypes.INTEGER, primaryKey:true},
+    pfp:{type:DataTypes.STRING}, //URL-адрес до изображения аватара на сервере
     nickname:{type:DataTypes.STRING, allowNull:false},
     bio:{type:DataTypes.STRING},
     email:{type:DataTypes.STRING},
@@ -53,7 +54,6 @@ const review = sequelizeInstance.define("review",{
     advantages:{type:DataTypes.STRING},
     disadvantages:{type:DataTypes.STRING},
     comment:{type:DataTypes.STRING},
-    bugs:{type:DataTypes.STRING},
     publication_date:{type:DataTypes.DATE, allowNull:false},
     last_update_date:{type:DataTypes.DATE},
     rating:{type:DataTypes.DECIMAL(10,2),allowNull:false},

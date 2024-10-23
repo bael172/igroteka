@@ -5,7 +5,7 @@ const chosen_game = require("../queries/chosen_game")
 
 //system
 router.post("/add",chosen_game.add)
-router.patch("/edit",chosen_game.edit) //req.query id_user id_game
+router.patch("/change",chosen_game.edit) //req.query id_user id_game
 
 //admin
 router.get("/getIdLibrary",chosen_game.get_id) //req.query id_user id_game
@@ -16,8 +16,9 @@ router.get("/getAll",chosen_game.get_all)
 router.get("/getIdGame/:id_game",chosen_game.get_id_game) //Выбор пользователей с одной и той же игрой
 
 //user
+router.post("/addGame",token,games.add_game)
 router.get("/getMyGames",token,games.get_my_games)
-router.delete("/deleteMyLibrary",token,games.delete_my_library)
+router.delete("/deleteGame",token,games.delete_game)
 
 //admin
 router.delete("/delete",chosen_game.delete_id_library) //req.query id_user id_game
